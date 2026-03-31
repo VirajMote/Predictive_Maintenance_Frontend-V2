@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fleet Overview | Digital Foreman</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Inter:wght@400;500;600&family=Roboto+Mono&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "on-primary-fixed-variant": "#006a34",
+          "error-container": "#7f2927",
+          "on-secondary-fixed-variant": "#755600",
+          "on-surface-variant": "#acabaa",
+          "primary-container": "#005227",
+          "surface-tint": "#4de082",
+          "surface-container-low": "#131313",
+          "on-primary-container": "#59eb8b",
+          "on-primary": "#004b23",
+          "tertiary": "#ff8887",
+          "surface-container-high": "#1f2020",
+          "surface-bright": "#2b2c2c",
+          "on-tertiary": "#60000e",
+          "surface-container-lowest": "#000000",
+          "tertiary-fixed-dim": "#ea6767",
+          "surface-container-highest": "#252626",
+          "inverse-surface": "#fcf9f8",
+          "secondary-fixed": "#ffdf9f",
+          "on-background": "#e7e5e5",
+          "error": "#ee7d77",
+          "on-primary-fixed": "#004a22",
+          "surface": "#0e0e0e",
+          "inverse-on-surface": "#565555",
+          "primary-fixed-dim": "#5def8f",
+          "surface-dim": "#0e0e0e",
+          "on-secondary-fixed": "#523c00",
+          "on-surface": "#e7e5e5",
+          "on-tertiary-container": "#490008",
+          "error-dim": "#bb5551",
+          "surface-variant": "#252626",
+          "secondary-dim": "#d6a000",
+          "primary-fixed": "#6dfe9c",
+          "outline-variant": "#484848",
+          "background": "#0e0e0e",
+          "on-secondary": "#453200",
+          "on-secondary-container": "#f1b617",
+          "on-error": "#490106",
+          "inverse-primary": "#006e36",
+          "surface-container": "#191a1a",
+          "primary": "#4de082",
+          "secondary-fixed-dim": "#ffcd61",
+          "tertiary-fixed": "#fb7373",
+          "secondary-container": "#4d3800",
+          "primary-dim": "#3bd276",
+          "on-tertiary-fixed-variant": "#5b000d",
+          "tertiary-dim": "#fb7373",
+          "outline": "#767575",
+          "on-error-container": "#ff9993",
+          "secondary": "#e6ad03",
+          "tertiary-container": "#fb7373",
+          "on-tertiary-fixed": "#000000"
+        },
+        fontFamily: { "headline": ["Manrope"], "body": ["Inter"], "label": ["Inter"] },
+        borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+      },
+    },
+  }
+</script>
+<style>
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    display: inline-block; line-height: 1; text-transform: none;
+    letter-spacing: normal; word-wrap: normal; white-space: nowrap; direction: ltr;
+  }
+  .status-pulse { box-shadow: 0 0 8px currentColor; }
+  .modal-backdrop { background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); }
+  .spinner { border: 3px solid rgba(77,224,130,0.2); border-top-color: #4de082; border-radius: 50%; width: 24px; height: 24px; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary/30">
+
+<!-- ── Sidebar ─────────────────────────────────────────────────────────────── -->
+<aside class="h-screen w-72 fixed left-0 top-0 flex flex-col bg-[#131313] border-r border-white/5 font-['Manrope'] font-medium tracking-tight text-sm justify-between py-8 px-4 z-50">
+  <div>
+    <div class="mb-10 px-4">
+      <h1 class="text-xl font-black tracking-tighter text-[#4de082] uppercase">Digital Foreman</h1>
+      <p class="text-[10px] text-on-surface-variant tracking-[0.2em] uppercase mt-1">Industrial Intelligence</p>
+    </div>
+    <nav class="space-y-1">
+      <a class="flex items-center gap-3 px-4 py-3 rounded text-[#4de082] bg-[#4de082]/10 border-r-4 border-[#4de082]" href="index.html">
+        <span class="material-symbols-outlined">factory</span><span>Fleet Overview</span>
+      </a>
+      <a class="flex items-center gap-3 px-4 py-3 rounded text-[#e7e5e5]/60 hover:text-emerald-300 hover:bg-white/5 transition-all" href="alerts.html">
+        <span class="material-symbols-outlined">warning</span><span>Predictive Alerts</span>
+      </a>
+    </nav>
+  </div>
+  <div class="space-y-6 px-4">
+    <button class="w-full bg-error text-on-error font-bold py-3 rounded-lg flex items-center justify-center gap-2 uppercase tracking-wider text-xs">
+      <span class="material-symbols-outlined text-sm">emergency</span>Emergency Stop
+    </button>
+  </div>
+</aside>
+
+<!-- ── Top Bar ─────────────────────────────────────────────────────────────── -->
+<header class="fixed top-0 right-0 left-72 h-20 z-40 bg-[#0e0e0e]/80 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-10">
+  <div class="flex items-center gap-4">
+    <div class="w-2 h-2 rounded-full bg-primary animate-pulse status-pulse"></div>
+    <h2 class="font-['Manrope'] font-bold text-lg text-[#e7e5e5]">System Health: Operational</h2>
+  </div>
+  <div class="flex items-center gap-4">
+    <span id="last-updated" class="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest"></span>
+    <button onclick="refreshAll()" class="text-neutral-400 hover:text-emerald-400 transition-colors" title="Refresh all">
+      <span class="material-symbols-outlined">refresh</span>
+    </button>
+  </div>
+</header>
+
+<!-- ── Main ────────────────────────────────────────────────────────────────── -->
+<main class="ml-72 mt-20 p-10 min-h-[calc(100vh-80px)]">
+
+  <!-- Summary strip -->
+  <section class="mb-12 grid grid-cols-12 gap-6 items-end">
+    <div class="col-span-12 lg:col-span-4">
+      <p class="text-primary font-bold tracking-[0.3em] text-[10px] uppercase mb-2">Fleet Intelligence Summary</p>
+      <h3 id="fleet-health-avg" class="font-headline font-extrabold text-5xl tracking-tighter text-on-surface">—<span class="text-primary text-2xl">%</span></h3>
+      <p class="text-on-surface-variant font-medium mt-1">Average Fleet Health Score</p>
+    </div>
+    <div class="col-span-12 lg:col-span-8 grid grid-cols-3 gap-6">
+      <div class="bg-surface-container p-6 rounded-xl border-l-2 border-primary">
+        <div class="flex justify-between items-start mb-4">
+          <span class="material-symbols-outlined text-primary/60">precision_manufacturing</span>
+          <span class="text-[10px] font-mono text-on-surface-variant">TOTAL ASSETS</span>
+        </div>
+        <div id="total-assets" class="text-3xl font-headline font-bold">4</div>
+        <div class="text-[10px] text-primary mt-1 font-mono uppercase tracking-widest">Monitored Machines</div>
+      </div>
+      <div class="bg-surface-container p-6 rounded-xl border-l-2 border-error">
+        <div class="flex justify-between items-start mb-4">
+          <span class="material-symbols-outlined text-error/60">emergency_home</span>
+          <span class="text-[10px] font-mono text-on-surface-variant">ACTIVE ALERTS</span>
+        </div>
+        <div id="active-alerts" class="text-3xl font-headline font-bold">—</div>
+        <div id="critical-count" class="text-[10px] text-error mt-1 font-mono uppercase tracking-widest">Loading...</div>
+      </div>
+      <div class="bg-surface-container p-6 rounded-xl border-l-2 border-secondary">
+        <div class="flex justify-between items-start mb-4">
+          <span class="material-symbols-outlined text-secondary/60">schedule</span>
+          <span class="text-[10px] font-mono text-on-surface-variant">AVG RUL</span>
+        </div>
+        <div id="avg-rul" class="text-3xl font-headline font-bold">—</div>
+        <div class="text-[10px] text-secondary mt-1 font-mono uppercase tracking-widest">Cycles Remaining</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Machine cards grid -->
+  <section id="machine-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+    <!-- Cards injected by JS -->
+  </section>
+
+</main>
+
+<!-- ── Predict Modal ───────────────────────────────────────────────────────── -->
+<div id="predict-modal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+  <div class="bg-[#191a1a] border border-white/10 rounded-xl w-full max-w-lg shadow-2xl">
+    <div class="flex justify-between items-center p-6 border-b border-white/5">
+      <div>
+        <h3 class="font-headline font-bold text-lg text-on-surface" id="modal-title">Run Prediction</h3>
+        <p class="text-xs text-on-surface-variant mt-1">Enter current sensor readings</p>
+      </div>
+      <button onclick="closeModal()" class="text-on-surface-variant hover:text-on-surface transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form id="predict-form" class="p-6 space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant mb-1 block">Machine Type</label>
+          <select id="inp-type" class="w-full bg-surface-container-highest border border-white/10 rounded-lg px-3 py-2.5 text-sm text-on-surface focus:ring-1 focus:ring-primary/40 focus:outline-none">
+            <option value="L">L — Low</option>
+            <option value="M" selected>M — Medium</option>
+            <option value="H">H — High</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant mb-1 block">Tool Wear (min)</label>
+          <input id="inp-wear" type="number" step="1" min="0" max="300" value="0" class="w-full bg-surface-container-highest border border-white/10 rounded-lg px-3 py-2.5 text-sm text-on-surface focus:ring-1 focus:ring-primary/40 focus:outline-none"/>
+        </div>
+        <div>
+          <label class="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant mb-1 block">Air Temp (K)</label>
+          <input id="inp-air-temp" type="number" step="0.1" value="298.1" class="w-full bg-surface-container-highest border border-white/10 rounded-lg px-3 py-2.5 text-sm text-on-surface focus:ring-1 focus:ring-primary/40 focus:outline-none"/>
+        </div>
+        <div>
+          <label class="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant mb-1 block">Process Temp (K)</label>
+          <input id="inp-proc-temp" type="number" step="0.1" value="308.6" class="w-full bg-surface-container-highest border border-white/10 rounded-lg px-3 py-2.5 text-sm text-on-surface focus:ring-1 focus:ring-primary/40 focus:outline-none"/>
+        </div>
+        <div>
+          <label class="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant mb-1 block">RPM</label>
+          <input id="inp-rpm" type="number" step="1" value="1551" class="w-full bg-surface-container-highest border border-white/10 rounded-lg px-3 py-2.5 text-sm text-on-surface focus:ring-1 focus:ring-primary/40 focus:outline-none"/>
+        </div>
+        <div>
+          <label class="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant mb-1 block">Torque (Nm)</label>
+          <input id="inp-torque" type="number" step="0.1" value="42.8" class="w-full bg-surface-container-highest border border-white/10 rounded-lg px-3 py-2.5 text-sm text-on-surface focus:ring-1 focus:ring-primary/40 focus:outline-none"/>
+        </div>
+      </div>
+      <button type="submit" class="w-full bg-primary text-on-primary font-bold py-3 rounded-lg uppercase tracking-widest text-xs hover:shadow-[0_0_20px_rgba(77,224,130,0.3)] transition-all flex items-center justify-center gap-2">
+        <span id="btn-text">Run Prediction</span>
+        <div id="btn-spinner" class="spinner hidden"></div>
+      </button>
+    </form>
+
+    <!-- Result panel (hidden until prediction runs) -->
+    <div id="result-panel" class="hidden px-6 pb-6 space-y-4">
+      <div class="border-t border-white/5 pt-4 grid grid-cols-3 gap-4">
+        <div class="bg-surface-container p-4 rounded-xl text-center">
+          <div class="text-[10px] font-mono text-on-surface-variant uppercase mb-1">Health Score</div>
+          <div id="res-health" class="text-2xl font-headline font-bold text-primary">—</div>
+        </div>
+        <div class="bg-surface-container p-4 rounded-xl text-center">
+          <div class="text-[10px] font-mono text-on-surface-variant uppercase mb-1">RUL (cycles)</div>
+          <div id="res-rul" class="text-2xl font-headline font-bold text-secondary">—</div>
+        </div>
+        <div class="bg-surface-container p-4 rounded-xl text-center">
+          <div class="text-[10px] font-mono text-on-surface-variant uppercase mb-1">Failure Risk</div>
+          <div id="res-failure" class="text-2xl font-headline font-bold">—</div>
+        </div>
+      </div>
+      <!-- Failure modes -->
+      <div id="res-modes" class="space-y-2"></div>
+      <!-- Alerts -->
+      <div id="res-alerts" class="space-y-2"></div>
+      <!-- View detail button -->
+      <a id="res-detail-link" href="#" class="block w-full text-center bg-surface-container-highest border border-white/10 text-primary font-bold py-2.5 rounded-lg text-xs uppercase tracking-widest hover:bg-surface-bright transition-all">
+        View Full Diagnostics →
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://predictivemaintenance-v2-production.up.railway.app';
+
+// ── Machine definitions ────────────────────────────────────────────────────
+const MACHINES = [
+  { id: 'TRB-A1',  name: 'Turbine-A1',       sector: 'Sector 07 / Power Gen',     type: 'H', defaults: { air: 298.1, proc: 310.5, rpm: 1408, torque: 52.1, wear: 180 } },
+  { id: 'CMP-B4',  name: 'Compressor-B4',     sector: 'Sector 02 / Gas Processing', type: 'M', defaults: { air: 297.8, proc: 308.6, rpm: 1551, torque: 42.8, wear: 0   } },
+  { id: 'PMP-C9',  name: 'Pump-Station-C',    sector: 'Sector 09 / Hydraulics',    type: 'L', defaults: { air: 300.2, proc: 311.3, rpm: 1285, torque: 65.4, wear: 240 } },
+  { id: 'DRL-A1',  name: 'Drill-Rig-Alpha',   sector: 'Sector 01 / Excavation',    type: 'M', defaults: { air: 296.9, proc: 307.1, rpm: 1623, torque: 38.2, wear: 45  } },
+];
+
+let machineResults = {};
+let currentMachineId = null;
+
+// ── Health gauge SVG ───────────────────────────────────────────────────────
+function healthGauge(score) {
+  const r = 40, circ = 2 * Math.PI * r;
+  const offset = circ * (1 - score / 100);
+  const color = score >= 70 ? '#4de082' : score >= 40 ? '#e6ad03' : '#ee7d77';
+  return `
+    <svg class="w-full h-full -rotate-90" viewBox="0 0 96 96">
+      <circle cx="48" cy="48" r="${r}" fill="transparent" stroke="#252626" stroke-width="6"/>
+      <circle cx="48" cy="48" r="${r}" fill="transparent" stroke="${color}"
+        stroke-dasharray="${circ}" stroke-dashoffset="${offset}" stroke-width="6" stroke-linecap="round"/>
+    </svg>
+    <div class="absolute inset-0 flex flex-col items-center justify-center">
+      <span class="text-xl font-headline font-bold">${Math.round(score)}</span>
+      <span class="text-[8px] text-on-surface-variant font-mono uppercase">Health</span>
+    </div>`;
+}
+
+// ── Status badge ──────────────────────────────────────────────────────────
+function statusBadge(label) {
+  const styles = {
+    Healthy:  'bg-primary-container text-on-primary-container',
+    Warning:  'bg-secondary-container text-on-secondary-container',
+    Critical: 'bg-error-container text-on-error-container',
+  };
+  return `<div class="px-2 py-1 rounded ${styles[label] || styles.Healthy} text-[10px] font-bold uppercase tracking-tighter">${label}</div>`;
+}
+
+// ── Top bar colour strip ──────────────────────────────────────────────────
+function stripColor(label) {
+  return label === 'Healthy' ? '#4de082' : label === 'Warning' ? '#e6ad03' : '#ee7d77';
+}
+
+// ── Build a machine card ──────────────────────────────────────────────────
+function buildCard(machine, result) {
+  const health = result ? result.health_score : null;
+  const rul    = result ? result.rul_cycles   : null;
+  const label  = result ? result.health_label : 'Unknown';
+  const fp     = result ? result.failure_probabilities['Machine failure'] : null;
+  const color  = result ? stripColor(label) : '#484848';
+
+  return `
+  <div class="bg-surface-container-high p-6 rounded-xl border border-white/5 hover:bg-surface-bright transition-all duration-300 relative overflow-hidden flex flex-col gap-4">
+    <div class="absolute top-0 left-0 w-full h-1" style="background:${color};opacity:0.6"></div>
+    <div class="flex justify-between items-start">
+      <div>
+        <h4 class="font-headline font-bold text-lg">${machine.name}</h4>
+        <p class="text-xs text-on-surface-variant font-mono uppercase tracking-wider">${machine.sector}</p>
+      </div>
+      ${result ? statusBadge(label) : '<div class="text-[10px] text-on-surface-variant font-mono animate-pulse">Loading…</div>'}
+    </div>
+
+    <div class="flex items-center gap-6">
+      <div class="relative w-24 h-24 flex items-center justify-center flex-shrink-0">
+        ${result ? healthGauge(health) : '<div class="w-20 h-20 rounded-full border-4 border-surface-container-highest animate-pulse"></div>'}
+      </div>
+      <div class="flex-1">
+        <div class="text-[10px] text-on-surface-variant mb-1 font-mono">EST. RUL</div>
+        ${result
+          ? `<div class="text-lg font-headline font-bold">${Math.round(rul)} <span class="text-xs font-normal text-on-surface-variant">cycles</span></div>
+             <div class="text-sm font-mono text-on-surface-variant">${Math.round(rul * 0.25)} hrs est.</div>`
+          : `<div class="text-lg font-headline font-bold text-on-surface-variant/40 animate-pulse">—</div>`
+        }
+      </div>
+    </div>
+
+    <div class="pt-3 border-t border-white/5 flex justify-between items-center">
+      <div class="text-xs font-mono text-on-surface-variant">
+        ${result ? `Failure risk: <span class="${fp > 0.4 ? 'text-error' : fp > 0.2 ? 'text-secondary' : 'text-primary'}">${(fp*100).toFixed(1)}%</span>` : ''}
+      </div>
+      <button onclick="openModal('${machine.id}')"
+        class="text-primary text-[10px] font-bold uppercase tracking-widest hover:underline">
+        ${result ? 'Diagnostics' : 'Run Prediction'}
+      </button>
+    </div>
+  </div>`;
+}
+
+// ── Render all cards ──────────────────────────────────────────────────────
+function renderCards() {
+  const grid = document.getElementById('machine-grid');
+  grid.innerHTML = MACHINES.map(m => buildCard(m, machineResults[m.id])).join('');
+}
+
+// ── Update summary strip ──────────────────────────────────────────────────
+function updateSummary() {
+  const results = Object.values(machineResults);
+  if (!results.length) return;
+  const avgHealth = results.reduce((s, r) => s + r.health_score, 0) / results.length;
+  const avgRul    = results.reduce((s, r) => s + r.rul_cycles, 0)   / results.length;
+  const alerts    = results.flatMap(r => r.alerts);
+  const critical  = results.filter(r => r.health_label === 'Critical').length;
+
+  document.getElementById('fleet-health-avg').innerHTML = `${Math.round(avgHealth)}<span class="text-primary text-2xl">%</span>`;
+  document.getElementById('avg-rul').textContent = Math.round(avgRul);
+  document.getElementById('active-alerts').textContent = alerts.length;
+  document.getElementById('critical-count').textContent = `${critical} Critical Machine${critical !== 1 ? 's' : ''}`;
+  document.getElementById('last-updated').textContent = `Updated ${new Date().toLocaleTimeString()}`;
+}
+
+// ── Fetch prediction for one machine ─────────────────────────────────────
+async function fetchMachine(machine) {
+  const d = machine.defaults;
+  const body = {
+    readings: [{
+      type_code: machine.type,
+      air_temperature_K: d.air,
+      process_temperature_K: d.proc,
+      rotational_speed_rpm: d.rpm,
+      torque_Nm: d.torque,
+      tool_wear_min: d.wear,
+    }]
+  };
+  try {
+    const res  = await fetch(`${API}/predict`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const data = await res.json();
+    machineResults[machine.id] = data;
+  } catch(e) {
+    console.error(`Failed to fetch ${machine.id}:`, e);
+  }
+}
+
+// ── Load all machines ─────────────────────────────────────────────────────
+async function refreshAll() {
+  renderCards(); // show loading state
+  await Promise.all(MACHINES.map(fetchMachine));
+  renderCards();
+  updateSummary();
+}
+
+// ── Modal open/close ──────────────────────────────────────────────────────
+function openModal(machineId) {
+  currentMachineId = machineId;
+  const machine = MACHINES.find(m => m.id === machineId);
+  document.getElementById('modal-title').textContent = `Diagnostics — ${machine.name}`;
+  document.getElementById('result-panel').classList.add('hidden');
+
+  // Pre-fill form with machine defaults
+  const d = machine.defaults;
+  document.getElementById('inp-type').value     = machine.type;
+  document.getElementById('inp-air-temp').value  = d.air;
+  document.getElementById('inp-proc-temp').value = d.proc;
+  document.getElementById('inp-rpm').value       = d.rpm;
+  document.getElementById('inp-torque').value    = d.torque;
+  document.getElementById('inp-wear').value      = d.wear;
+
+  // If we already have a result, show it
+  if (machineResults[machineId]) {
+    showResult(machineResults[machineId], machineId);
+  }
+
+  document.getElementById('predict-modal').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('predict-modal').classList.add('hidden');
+  currentMachineId = null;
+}
+
+// ── Show prediction result in modal ──────────────────────────────────────
+function showResult(data, machineId) {
+  const healthColor = data.health_score >= 70 ? 'text-primary' : data.health_score >= 40 ? 'text-secondary' : 'text-error';
+  const failProb    = data.failure_probabilities['Machine failure'];
+  const failColor   = failProb > 0.4 ? 'text-error' : failProb > 0.2 ? 'text-secondary' : 'text-primary';
+
+  document.getElementById('res-health').className  = `text-2xl font-headline font-bold ${healthColor}`;
+  document.getElementById('res-health').textContent = `${Math.round(data.health_score)}/100`;
+  document.getElementById('res-rul').textContent    = `${Math.round(data.rul_cycles)}`;
+  document.getElementById('res-failure').className  = `text-2xl font-headline font-bold ${failColor}`;
+  document.getElementById('res-failure').textContent = `${(failProb * 100).toFixed(1)}%`;
+
+  // Failure modes
+  const modes = Object.entries(data.failure_probabilities).filter(([k]) => k !== 'Machine failure');
+  document.getElementById('res-modes').innerHTML = modes.map(([label, prob]) => {
+    const pct   = (prob * 100).toFixed(1);
+    const color = prob > 0.4 ? '#ee7d77' : prob > 0.2 ? '#e6ad03' : '#4de082';
+    return `
+      <div class="space-y-1">
+        <div class="flex justify-between text-xs font-label">
+          <span class="text-on-surface">${label}</span>
+          <span class="text-on-surface-variant">${pct}%</span>
+        </div>
+        <div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+          <div class="h-full rounded-full transition-all duration-500" style="width:${Math.max(pct, 2)}%;background:${color}"></div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Alerts
+  document.getElementById('res-alerts').innerHTML = data.alerts.length
+    ? data.alerts.map(a => `<div class="bg-surface-container-high px-4 py-2.5 rounded-lg text-xs text-on-surface border border-white/5">${a}</div>`).join('')
+    : `<div class="bg-primary/10 px-4 py-2.5 rounded-lg text-xs text-primary border border-primary/20">✓ No active alerts — machine operating normally</div>`;
+
+  // Detail link
+  const machine = MACHINES.find(m => m.id === machineId);
+  const params  = new URLSearchParams({
+    id: machineId, name: machine.name, sector: machine.sector,
+    health: data.health_score, rul: data.rul_cycles, label: data.health_label,
+    fp: JSON.stringify(data.failure_probabilities), alerts: JSON.stringify(data.alerts),
+  });
+  document.getElementById('res-detail-link').href = `machine.html?${params}`;
+  document.getElementById('result-panel').classList.remove('hidden');
+}
+
+// ── Form submit ───────────────────────────────────────────────────────────
+document.getElementById('predict-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn     = document.getElementById('btn-text');
+  const spinner = document.getElementById('btn-spinner');
+  btn.textContent = 'Running…';
+  spinner.classList.remove('hidden');
+
+  const body = {
+    readings: [{
+      type_code:             document.getElementById('inp-type').value,
+      air_temperature_K:     parseFloat(document.getElementById('inp-air-temp').value),
+      process_temperature_K: parseFloat(document.getElementById('inp-proc-temp').value),
+      rotational_speed_rpm:  parseFloat(document.getElementById('inp-rpm').value),
+      torque_Nm:             parseFloat(document.getElementById('inp-torque').value),
+      tool_wear_min:         parseFloat(document.getElementById('inp-wear').value),
+    }]
+  };
+
+  try {
+    const res  = await fetch(`${API}/predict`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const data = await res.json();
+    if (currentMachineId) {
+      machineResults[currentMachineId] = data;
+      renderCards();
+      updateSummary();
+    }
+    showResult(data, currentMachineId);
+  } catch(err) {
+    alert('API error: ' + err.message);
+  } finally {
+    btn.textContent = 'Run Prediction';
+    spinner.classList.add('hidden');
+  }
+});
+
+// Close modal on backdrop click
+document.getElementById('predict-modal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+// ── Boot ──────────────────────────────────────────────────────────────────
+refreshAll();
+// Auto-refresh every 60 seconds
+setInterval(refreshAll, 60000);
+</script>
+</body>
+</html>

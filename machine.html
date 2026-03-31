@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Machine Detail | Digital Foreman</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;500;700;800&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "on-primary-fixed-variant": "#006a34", "error-container": "#7f2927",
+          "on-secondary-fixed-variant": "#755600", "on-surface-variant": "#acabaa",
+          "primary-container": "#005227", "surface-tint": "#4de082",
+          "surface-container-low": "#131313", "on-primary-container": "#59eb8b",
+          "on-primary": "#004b23", "tertiary": "#ff8887",
+          "surface-container-high": "#1f2020", "surface-bright": "#2b2c2c",
+          "on-tertiary": "#60000e", "surface-container-lowest": "#000000",
+          "surface-container-highest": "#252626", "inverse-surface": "#fcf9f8",
+          "on-background": "#e7e5e5", "error": "#ee7d77", "surface": "#0e0e0e",
+          "primary-fixed-dim": "#5def8f", "on-surface": "#e7e5e5",
+          "error-dim": "#bb5551", "surface-variant": "#252626",
+          "secondary-dim": "#d6a000", "primary-fixed": "#6dfe9c",
+          "outline-variant": "#484848", "background": "#0e0e0e",
+          "on-secondary": "#453200", "on-secondary-container": "#f1b617",
+          "inverse-primary": "#006e36", "surface-container": "#191a1a",
+          "primary": "#4de082", "secondary-container": "#4d3800",
+          "primary-dim": "#3bd272", "outline": "#767575",
+          "on-error-container": "#ff9993", "secondary": "#e6ad03",
+          "tertiary-container": "#fb7373",
+        },
+        fontFamily: { "headline": ["Manrope"], "body": ["Inter"] },
+        borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+      },
+    },
+  }
+</script>
+<style>
+  .material-symbols-outlined {
+    font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+    display:inline-block; line-height:1; text-transform:none;
+    letter-spacing:normal; word-wrap:normal; white-space:nowrap; direction:ltr;
+  }
+  .spinner { border:3px solid rgba(77,224,130,0.2); border-top-color:#4de082; border-radius:50%; width:20px; height:20px; animation:spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body class="bg-surface text-on-surface font-body overflow-hidden">
+
+<!-- ── Sidebar ─────────────────────────────────────────────────────────────── -->
+<aside class="h-screen w-72 fixed left-0 top-0 flex flex-col bg-[#131313] border-r border-white/5 font-['Manrope'] font-medium tracking-tight text-sm justify-between py-8 px-4 z-50">
+  <div class="space-y-10">
+    <div class="px-2">
+      <div class="text-xl font-black tracking-tighter text-[#4de082] uppercase">Digital Foreman</div>
+      <div class="text-xs text-on-surface-variant tracking-widest uppercase mt-1 opacity-60">Industrial Intelligence</div>
+    </div>
+    <nav class="space-y-1">
+      <a class="flex items-center gap-3 px-3 py-2.5 text-[#e7e5e5]/60 hover:text-emerald-300 hover:bg-white/5 transition-all" href="index.html">
+        <span class="material-symbols-outlined">factory</span><span>Fleet Overview</span>
+      </a>
+      <a class="flex items-center gap-3 px-3 py-2.5 text-[#4de082] bg-[#4de082]/10 border-r-4 border-[#4de082]" href="#">
+        <span class="material-symbols-outlined">sensors</span><span>Live Telemetry</span>
+      </a>
+      <a class="flex items-center gap-3 px-3 py-2.5 text-[#e7e5e5]/60 hover:text-emerald-300 hover:bg-white/5 transition-all" href="alerts.html">
+        <span class="material-symbols-outlined">warning</span><span>Predictive Alerts</span>
+      </a>
+    </nav>
+  </div>
+  <div class="space-y-6">
+    <button class="w-full py-3 bg-error-container text-on-error-container font-bold rounded-lg flex items-center justify-center gap-2 hover:opacity-90 transition-all">
+      <span class="material-symbols-outlined">emergency</span><span>Emergency Stop</span>
+    </button>
+  </div>
+</aside>
+
+<!-- ── Top Bar ─────────────────────────────────────────────────────────────── -->
+<header class="fixed top-0 right-0 left-72 h-20 z-40 bg-[#0e0e0e]/80 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-10 font-['Manrope'] font-bold text-lg">
+  <div class="flex items-center gap-6">
+    <span class="text-lg font-bold text-[#e7e5e5]">System Health: Operational</span>
+    <div class="flex items-center gap-2 bg-primary/10 px-3 py-1 rounded-full">
+      <div class="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+      <span class="text-[10px] uppercase tracking-widest text-primary">Live Connection</span>
+    </div>
+  </div>
+  <a href="index.html" class="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 text-sm font-normal">
+    <span class="material-symbols-outlined text-base">arrow_back</span> Back to Fleet
+  </a>
+</header>
+
+<!-- ── Main ────────────────────────────────────────────────────────────────── -->
+<main class="pl-72 pt-20 h-screen overflow-y-auto bg-surface">
+<div class="p-10 space-y-8">
+
+  <!-- Page title -->
+  <div class="flex justify-between items-end">
+    <div>
+      <div class="flex items-center gap-2 text-on-surface-variant text-sm uppercase tracking-widest mb-1">
+        <a href="index.html" class="hover:text-primary transition-colors">Assets</a>
+        <span class="material-symbols-outlined text-[10px]">chevron_right</span>
+        <span id="machine-name-title">—</span>
+      </div>
+      <h1 id="machine-full-name" class="text-4xl font-extrabold tracking-tight">Loading…</h1>
+    </div>
+    <div class="flex gap-4">
+      <div class="px-6 py-4 bg-surface-container-high rounded-xl border-l-4 border-primary shadow-lg">
+        <div class="text-[10px] text-on-surface-variant uppercase tracking-widest mb-1">RUL Prediction</div>
+        <div id="rul-display" class="text-2xl font-black text-primary font-headline">— cycles</div>
+      </div>
+      <div class="px-6 py-4 bg-surface-container-high rounded-xl border-l-4 border-secondary shadow-lg">
+        <div class="text-[10px] text-on-surface-variant uppercase tracking-widest mb-1">Service Status</div>
+        <div id="status-display" class="text-2xl font-black text-secondary font-headline">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bento grid -->
+  <div class="grid grid-cols-12 gap-6">
+
+    <!-- Health gauge -->
+    <div class="col-span-12 lg:col-span-4 bg-surface-container rounded-xl p-8 flex flex-col items-center justify-center relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none"></div>
+      <div class="relative z-10 text-center">
+        <h3 class="text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-8">System Health Score</h3>
+        <div class="relative w-48 h-48 mb-6" id="health-gauge-container">
+          <!-- injected by JS -->
+        </div>
+        <p id="health-note" class="text-sm text-on-surface-variant max-w-[240px]">Loading prediction data…</p>
+      </div>
+    </div>
+
+    <!-- Failure modes -->
+    <div class="col-span-12 lg:col-span-8 bg-surface-container-low rounded-xl p-8 flex flex-col">
+      <div class="flex justify-between items-center mb-8">
+        <h3 class="text-sm font-bold font-headline uppercase tracking-widest">Failure Mode Analysis</h3>
+        <div class="text-[10px] text-on-surface-variant">Model: RF (Predictive Maintenance)</div>
+      </div>
+      <div id="failure-modes" class="flex-1 space-y-5">
+        <div class="animate-pulse space-y-3">
+          <div class="h-4 bg-surface-container-highest rounded w-3/4"></div>
+          <div class="h-4 bg-surface-container-highest rounded w-1/2"></div>
+          <div class="h-4 bg-surface-container-highest rounded w-2/3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alerts panel -->
+    <div class="col-span-12 lg:col-span-5 bg-surface-container rounded-xl p-8">
+      <h3 class="text-sm font-bold font-headline uppercase tracking-widest mb-6">Active Alerts</h3>
+      <div id="alerts-panel" class="space-y-3">
+        <div class="animate-pulse h-12 bg-surface-container-highest rounded-lg"></div>
+      </div>
+    </div>
+
+    <!-- Re-predict form -->
+    <div class="col-span-12 lg:col-span-7 bg-surface-container-low rounded-xl p-8">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-sm font-bold font-headline uppercase tracking-widest">Live Prediction</h3>
+        <span class="text-[10px] font-mono text-on-surface-variant">Update sensor readings</span>
+      </div>
+      <form id="repredict-form" class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant mb-1 block">Machine Type</label>
+            <select id="r-type" class="w-full bg-surface-container-highest border border-white/10 rounded-lg px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/40 focus:outline-none">
+              <option value="L">L — Low</option>
+              <option value="M">M — Medium</option>
+              <option value="H">H — High</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant mb-1 block">Tool Wear (min)</label>
+            <input id="r-wear" type="number" step="1" min="0" max="300" class="w-full bg-surface-container-highest border border-white/10 rounded-lg px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/40 focus:outline-none"/>
+          </div>
+          <div>
+            <label class="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant mb-1 block">Air Temp (K)</label>
+            <input id="r-air" type="number" step="0.1" class="w-full bg-surface-container-highest border border-white/10 rounded-lg px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/40 focus:outline-none"/>
+          </div>
+          <div>
+            <label class="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant mb-1 block">Process Temp (K)</label>
+            <input id="r-proc" type="number" step="0.1" class="w-full bg-surface-container-highest border border-white/10 rounded-lg px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/40 focus:outline-none"/>
+          </div>
+          <div>
+            <label class="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant mb-1 block">RPM</label>
+            <input id="r-rpm" type="number" step="1" class="w-full bg-surface-container-highest border border-white/10 rounded-lg px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/40 focus:outline-none"/>
+          </div>
+          <div>
+            <label class="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant mb-1 block">Torque (Nm)</label>
+            <input id="r-torque" type="number" step="0.1" class="w-full bg-surface-container-highest border border-white/10 rounded-lg px-3 py-2.5 text-sm focus:ring-1 focus:ring-primary/40 focus:outline-none"/>
+          </div>
+        </div>
+        <button type="submit" class="w-full bg-primary text-on-primary font-bold py-3 rounded-lg uppercase tracking-widest text-xs hover:shadow-[0_0_20px_rgba(77,224,130,0.3)] transition-all flex items-center justify-center gap-2">
+          <span id="r-btn-text">Update Prediction</span>
+          <div id="r-spinner" class="spinner hidden"></div>
+        </button>
+      </form>
+    </div>
+
+  </div>
+</div>
+</main>
+
+<script>
+const API = 'https://predictivemaintenance-v2-production.up.railway.app';
+
+// ── Read URL params ───────────────────────────────────────────────────────
+const params = new URLSearchParams(window.location.search);
+const machineId   = params.get('id')     || 'Unknown';
+const machineName = params.get('name')   || 'Machine';
+const sector      = params.get('sector') || '';
+
+// Set titles
+document.getElementById('machine-name-title').textContent = machineName;
+document.getElementById('machine-full-name').textContent  = machineName;
+document.title = `${machineName} | Digital Foreman`;
+
+// Pre-fill form from URL params (initial sensor values from fleet page)
+// These come from the machines defaults array via URL — best effort
+const urlHealth = parseFloat(params.get('health'));
+const urlRul    = parseFloat(params.get('rul'));
+const urlLabel  = params.get('label') || 'Unknown';
+const urlFp     = params.get('fp')     ? JSON.parse(params.get('fp'))     : null;
+const urlAlerts = params.get('alerts') ? JSON.parse(params.get('alerts')) : null;
+
+// ── Render health gauge ───────────────────────────────────────────────────
+function renderGauge(score) {
+  const r = 88, circ = 2 * Math.PI * r;
+  const offset = circ * (1 - score / 100);
+  const color  = score >= 70 ? '#4de082' : score >= 40 ? '#e6ad03' : '#ee7d77';
+  const label  = score >= 70 ? 'Nominal' : score >= 40 ? 'Warning' : 'Critical';
+  document.getElementById('health-gauge-container').innerHTML = `
+    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 192 192">
+      <circle cx="96" cy="96" r="${r}" fill="transparent" stroke="#252626" stroke-width="8"/>
+      <circle cx="96" cy="96" r="${r}" fill="transparent" stroke="${color}"
+        stroke-dasharray="${circ}" stroke-dashoffset="${offset}"
+        stroke-width="12" stroke-linecap="round"/>
+    </svg>
+    <div class="absolute inset-0 flex flex-col items-center justify-center">
+      <span class="text-6xl font-extrabold font-headline tracking-tighter">${Math.round(score)}<span class="text-2xl opacity-40">%</span></span>
+      <span class="text-[10px] font-bold uppercase tracking-widest mt-1" style="color:${color}">${label}</span>
+    </div>`;
+}
+
+// ── Render failure modes ──────────────────────────────────────────────────
+function renderFailureModes(fp) {
+  document.getElementById('failure-modes').innerHTML = Object.entries(fp).map(([label, prob]) => {
+    const pct   = (prob * 100).toFixed(2);
+    const color = prob > 0.4 ? '#ee7d77' : prob > 0.2 ? '#e6ad03' : '#4de082';
+    return `
+      <div class="space-y-1.5">
+        <div class="flex justify-between text-xs font-label">
+          <span class="text-on-surface font-medium">${label}</span>
+          <span class="text-on-surface-variant font-mono">${pct}% risk</span>
+        </div>
+        <div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+          <div class="h-full rounded-full transition-all duration-700" style="width:${Math.max(parseFloat(pct), 1)}%;background:${color}"></div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Render alerts ─────────────────────────────────────────────────────────
+function renderAlerts(alerts) {
+  document.getElementById('alerts-panel').innerHTML = alerts.length
+    ? alerts.map(a => `<div class="bg-surface-container-high px-4 py-3 rounded-lg text-sm text-on-surface border border-white/5">${a}</div>`).join('')
+    : `<div class="bg-primary/10 px-4 py-3 rounded-lg text-sm text-primary border border-primary/20 flex items-center gap-2">
+         <span class="material-symbols-outlined text-base">check_circle</span>
+         No active alerts — machine operating normally
+       </div>`;
+}
+
+// ── Display prediction data ───────────────────────────────────────────────
+function displayData(health, rul, label, fp, alerts) {
+  renderGauge(health);
+  document.getElementById('rul-display').textContent    = `${Math.round(rul)} cycles`;
+  document.getElementById('status-display').textContent = label;
+  document.getElementById('status-display').className   =
+    `text-2xl font-black font-headline ${label === 'Healthy' ? 'text-primary' : label === 'Warning' ? 'text-secondary' : 'text-error'}`;
+  document.getElementById('health-note').textContent =
+    `Health score ${Math.round(health)}/100 — ${label === 'Healthy' ? 'operating within normal parameters' : label === 'Warning' ? 'monitor closely, maintenance soon' : 'immediate inspection required'}`;
+  renderFailureModes(fp);
+  renderAlerts(alerts);
+}
+
+// ── Load from URL params if available ────────────────────────────────────
+if (urlHealth && urlFp && urlAlerts) {
+  displayData(urlHealth, urlRul, urlLabel, urlFp, urlAlerts);
+}
+
+// ── Re-predict form ───────────────────────────────────────────────────────
+document.getElementById('repredict-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn     = document.getElementById('r-btn-text');
+  const spinner = document.getElementById('r-spinner');
+  btn.textContent = 'Running…';
+  spinner.classList.remove('hidden');
+
+  const body = {
+    readings: [{
+      type_code:             document.getElementById('r-type').value,
+      air_temperature_K:     parseFloat(document.getElementById('r-air').value),
+      process_temperature_K: parseFloat(document.getElementById('r-proc').value),
+      rotational_speed_rpm:  parseFloat(document.getElementById('r-rpm').value),
+      torque_Nm:             parseFloat(document.getElementById('r-torque').value),
+      tool_wear_min:         parseFloat(document.getElementById('r-wear').value),
+    }]
+  };
+
+  try {
+    const res  = await fetch(`${API}/predict`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const data = await res.json();
+    displayData(data.health_score, data.rul_cycles, data.health_label,
+                data.failure_probabilities, data.alerts);
+  } catch(err) {
+    alert('API error: ' + err.message);
+  } finally {
+    btn.textContent = 'Update Prediction';
+    spinner.classList.add('hidden');
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Predictive Alerts | Digital Foreman</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "on-surface-variant":"#acabaa","surface-container-low":"#131313",
+          "on-primary-container":"#59eb8b","on-primary":"#004b23",
+          "surface-container-high":"#1f2020","surface-bright":"#2b2c2c",
+          "surface-container-lowest":"#000000","surface-container-highest":"#252626",
+          "on-background":"#e7e5e5","error":"#ee7d77","surface":"#0e0e0e",
+          "on-surface":"#e7e5e5","error-dim":"#bb5551","surface-variant":"#252626",
+          "secondary-dim":"#d6a000","outline-variant":"#484848","background":"#0e0e0e",
+          "on-secondary-container":"#f1b617","surface-container":"#191a1a",
+          "primary":"#4de082","secondary-container":"#4d3800","outline":"#767575",
+          "on-error-container":"#ff9993","secondary":"#e6ad03",
+          "error-container":"#7f2927","primary-container":"#005227",
+        },
+        fontFamily: { "headline":["Manrope"],"body":["Inter"] },
+        borderRadius: {"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},
+      },
+    },
+  }
+</script>
+<style>
+  .material-symbols-outlined {
+    font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+    display:inline-block;line-height:1;text-transform:none;letter-spacing:normal;
+    word-wrap:normal;white-space:nowrap;direction:ltr;
+  }
+  .spinner{border:3px solid rgba(77,224,130,0.2);border-top-color:#4de082;border-radius:50%;width:20px;height:20px;animation:spin 0.8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body class="bg-surface text-on-surface font-body">
+
+<!-- ── Sidebar ─────────────────────────────────────────────────────────────── -->
+<aside class="h-screen w-72 fixed left-0 top-0 flex flex-col bg-[#131313] border-r border-white/5 font-['Manrope'] font-medium tracking-tight text-sm justify-between py-8 px-4 z-50">
+  <div>
+    <div class="mb-10 px-4">
+      <h1 class="text-xl font-black tracking-tighter text-[#4de082] uppercase">Digital Foreman</h1>
+      <p class="text-[10px] text-on-surface-variant tracking-[0.2em] uppercase mt-1">Industrial Intelligence</p>
+    </div>
+    <nav class="space-y-1">
+      <a class="flex items-center gap-3 px-4 py-3 rounded text-[#e7e5e5]/60 hover:text-emerald-300 hover:bg-white/5 transition-all" href="index.html">
+        <span class="material-symbols-outlined">factory</span><span>Fleet Overview</span>
+      </a>
+      <a class="flex items-center gap-3 px-4 py-3 rounded text-[#4de082] bg-[#4de082]/10 border-r-4 border-[#4de082]" href="alerts.html">
+        <span class="material-symbols-outlined">warning</span><span>Predictive Alerts</span>
+      </a>
+    </nav>
+  </div>
+  <div class="space-y-6 px-4">
+    <button class="w-full bg-error text-on-error font-bold py-3 rounded-lg flex items-center justify-center gap-2 uppercase tracking-wider text-xs">
+      <span class="material-symbols-outlined text-sm">emergency</span>Emergency Stop
+    </button>
+  </div>
+</aside>
+
+<!-- ── Top Bar ─────────────────────────────────────────────────────────────── -->
+<header class="fixed top-0 right-0 left-72 h-20 z-40 bg-[#0e0e0e]/80 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-10">
+  <div class="flex items-center gap-4">
+    <div class="w-2 h-2 rounded-full bg-error animate-pulse"></div>
+    <h2 class="font-['Manrope'] font-bold text-lg text-[#e7e5e5]">Predictive Alerts</h2>
+  </div>
+  <div class="flex items-center gap-4">
+    <span id="last-updated" class="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest"></span>
+    <button onclick="loadAlerts()" class="text-neutral-400 hover:text-emerald-400 transition-colors">
+      <span class="material-symbols-outlined">refresh</span>
+    </button>
+  </div>
+</header>
+
+<!-- ── Main ────────────────────────────────────────────────────────────────── -->
+<main class="ml-72 mt-20 p-10 min-h-[calc(100vh-80px)]">
+
+  <div class="mb-8 flex items-center justify-between">
+    <div>
+      <p class="text-primary font-bold tracking-[0.3em] text-[10px] uppercase mb-2">Fleet Alert Center</p>
+      <h2 class="font-headline font-extrabold text-3xl tracking-tighter">Active Predictions</h2>
+    </div>
+    <div id="alert-summary" class="flex gap-4"></div>
+  </div>
+
+  <div id="alerts-container" class="space-y-4">
+    <!-- Loading state -->
+    <div class="animate-pulse space-y-4">
+      <div class="h-24 bg-surface-container rounded-xl"></div>
+      <div class="h-24 bg-surface-container rounded-xl"></div>
+      <div class="h-24 bg-surface-container rounded-xl"></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+const API = 'https://predictivemaintenance-v2-production.up.railway.app';
+
+const MACHINES = [
+  { id:'TRB-A1', name:'Turbine-A1',     sector:'Sector 07 / Power Gen',      type:'H', defaults:{air:298.1,proc:310.5,rpm:1408,torque:52.1,wear:180} },
+  { id:'CMP-B4', name:'Compressor-B4',  sector:'Sector 02 / Gas Processing', type:'M', defaults:{air:297.8,proc:308.6,rpm:1551,torque:42.8,wear:0  } },
+  { id:'PMP-C9', name:'Pump-Station-C', sector:'Sector 09 / Hydraulics',     type:'L', defaults:{air:300.2,proc:311.3,rpm:1285,torque:65.4,wear:240} },
+  { id:'DRL-A1', name:'Drill-Rig-Alpha',sector:'Sector 01 / Excavation',     type:'M', defaults:{air:296.9,proc:307.1,rpm:1623,torque:38.2,wear:45 } },
+];
+
+async function fetchPrediction(machine) {
+  const d = machine.defaults;
+  const res = await fetch(`${API}/predict`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ readings:[{
+      type_code: machine.type,
+      air_temperature_K: d.air, process_temperature_K: d.proc,
+      rotational_speed_rpm: d.rpm, torque_Nm: d.torque, tool_wear_min: d.wear,
+    }]})
+  });
+  return res.json();
+}
+
+function severityIcon(label) {
+  return label === 'Critical' ? '🔴' : label === 'Warning' ? '🟡' : '🟢';
+}
+
+function buildAlertCard(machine, data) {
+  const fp       = data.failure_probabilities['Machine failure'];
+  const hasAlerts = data.alerts.length > 0;
+  const borderColor = data.health_label === 'Critical' ? 'border-error' : data.health_label === 'Warning' ? 'border-secondary' : 'border-primary';
+  const bgColor     = data.health_label === 'Critical' ? 'bg-error/5'   : data.health_label === 'Warning' ? 'bg-secondary/5'  : 'bg-primary/5';
+
+  const detailParams = new URLSearchParams({
+    id: machine.id, name: machine.name, sector: machine.sector,
+    health: data.health_score, rul: data.rul_cycles, label: data.health_label,
+    fp: JSON.stringify(data.failure_probabilities), alerts: JSON.stringify(data.alerts),
+  });
+
+  return `
+  <div class="bg-surface-container rounded-xl border border-white/5 border-l-4 ${borderColor} ${bgColor} p-6 flex items-start gap-6">
+    <div class="text-2xl flex-shrink-0 mt-1">${severityIcon(data.health_label)}</div>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h4 class="font-headline font-bold text-lg">${machine.name}</h4>
+          <p class="text-xs text-on-surface-variant font-mono uppercase tracking-wider">${machine.sector}</p>
+        </div>
+        <div class="flex gap-3 flex-shrink-0">
+          <div class="text-right">
+            <div class="text-[10px] font-mono text-on-surface-variant">Health</div>
+            <div class="font-headline font-bold ${data.health_label === 'Healthy' ? 'text-primary' : data.health_label === 'Warning' ? 'text-secondary' : 'text-error'}">${Math.round(data.health_score)}/100</div>
+          </div>
+          <div class="text-right">
+            <div class="text-[10px] font-mono text-on-surface-variant">RUL</div>
+            <div class="font-headline font-bold text-on-surface">${Math.round(data.rul_cycles)} cycles</div>
+          </div>
+          <div class="text-right">
+            <div class="text-[10px] font-mono text-on-surface-variant">Failure Risk</div>
+            <div class="font-headline font-bold ${fp > 0.4 ? 'text-error' : fp > 0.2 ? 'text-secondary' : 'text-primary'}">${(fp*100).toFixed(1)}%</div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-4 space-y-2">
+        ${hasAlerts
+          ? data.alerts.map(a => `<div class="text-sm text-on-surface bg-surface-container-high px-3 py-2 rounded-lg border border-white/5">${a}</div>`).join('')
+          : `<div class="text-sm text-primary bg-primary/10 px-3 py-2 rounded-lg border border-primary/20">✓ No active alerts — operating normally</div>`
+        }
+      </div>
+      <div class="mt-4">
+        <a href="machine.html?${detailParams}" class="text-primary text-[10px] font-bold uppercase tracking-widest hover:underline">
+          View Full Diagnostics →
+        </a>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function loadAlerts() {
+  document.getElementById('alerts-container').innerHTML = `
+    <div class="animate-pulse space-y-4">
+      <div class="h-24 bg-surface-container rounded-xl"></div>
+      <div class="h-24 bg-surface-container rounded-xl"></div>
+      <div class="h-24 bg-surface-container rounded-xl"></div>
+    </div>`;
+
+  const results = await Promise.all(MACHINES.map(async m => {
+    try {
+      const data = await fetchPrediction(m);
+      return { machine: m, data };
+    } catch(e) {
+      return { machine: m, data: null };
+    }
+  }));
+
+  // Sort: Critical first, then Warning, then Healthy
+  const order = { Critical:0, Warning:1, Healthy:2 };
+  results.sort((a, b) => {
+    if (!a.data) return 1;
+    if (!b.data) return -1;
+    return (order[a.data.health_label] ?? 3) - (order[b.data.health_label] ?? 3);
+  });
+
+  const critical = results.filter(r => r.data?.health_label === 'Critical').length;
+  const warning  = results.filter(r => r.data?.health_label === 'Warning').length;
+  const healthy  = results.filter(r => r.data?.health_label === 'Healthy').length;
+
+  document.getElementById('alert-summary').innerHTML = `
+    <div class="bg-error/10 border border-error/30 px-4 py-2 rounded-lg text-center">
+      <div class="text-2xl font-headline font-bold text-error">${critical}</div>
+      <div class="text-[10px] font-mono text-on-surface-variant uppercase">Critical</div>
+    </div>
+    <div class="bg-secondary/10 border border-secondary/30 px-4 py-2 rounded-lg text-center">
+      <div class="text-2xl font-headline font-bold text-secondary">${warning}</div>
+      <div class="text-[10px] font-mono text-on-surface-variant uppercase">Warning</div>
+    </div>
+    <div class="bg-primary/10 border border-primary/30 px-4 py-2 rounded-lg text-center">
+      <div class="text-2xl font-headline font-bold text-primary">${healthy}</div>
+      <div class="text-[10px] font-mono text-on-surface-variant uppercase">Healthy</div>
+    </div>`;
+
+  document.getElementById('alerts-container').innerHTML = results
+    .map(r => r.data ? buildAlertCard(r.machine, r.data) : `
+      <div class="bg-surface-container rounded-xl p-6 border border-white/5 text-on-surface-variant text-sm">
+        Failed to load ${r.machine.name}
+      </div>`)
+    .join('');
+
+  document.getElementById('last-updated').textContent = `Updated ${new Date().toLocaleTimeString()}`;
+}
+
+loadAlerts();
+setInterval(loadAlerts, 60000);
+</script>
+</body>
+</html>
